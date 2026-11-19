@@ -78,6 +78,17 @@ class TestEmbeddingBasedDocumentSplitter:
         with pytest.raises(ValueError, match="content for document ID"):
             splitter.run(documents=[Document(content=None)])
 
+    def test_run_processes_documents_before_later_validation_error(self):
+        mock_embedder = Mock()
+        splitter = EmbeddingBasedDocumentSplitter(document_embedder=mock_embedder)
+        splitter.sentence_splitter = Mock()
+
+        with patch.object(splitter, "_split_document", return_value=[Document(content="split")]) as split_document:
+            with pytest.raises(ValueError, match="content for document ID"):
+                splitter.run(documents=[Document(content="valid"), Document(content=None)])
+
+        split_document.assert_called_once()
+
     @pytest.mark.asyncio
     async def test_run_document_with_none_content_async(self) -> None:
         mock_embedder = AsyncMock()

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from asyncio import gather
-from collections.abc import Awaitable
+from collections.abc import Awaitable, Iterator
 from copy import deepcopy
 from itertools import chain
 from typing import Any
@@ -169,6 +169,22 @@ class EmbeddingBasedDocumentSplitter:
         elif hasattr(self.document_embedder, "close"):
             self.document_embedder.close()
 
+    def _validated_documents(self, documents: list[Document]) -> Iterator[Document]:
+        if not isinstance(documents, list) or (documents and not isinstance(documents[0], Document)):
+            raise TypeError("EmbeddingBasedDocumentSplitter expects a List of Documents as input.")
+
+        # Yield lazily to preserve per-document validation and processing order.
+        for doc in documents:
+            if doc.content is None:
+                raise ValueError(
+                    f"EmbeddingBasedDocumentSplitter only works with text documents but content for "
+                    f"document ID {doc.id} is None."
+                )
+            if doc.content == "":
+                logger.warning("Document ID {doc_id} has an empty content. Skipping this document.", doc_id=doc.id)
+                continue
+            yield doc
+
     @component.output_types(documents=list[Document])
     def run(self, documents: list[Document]) -> dict[str, list[Document]]:
         """
@@ -190,20 +206,8 @@ class EmbeddingBasedDocumentSplitter:
         """
         self.warm_up()
 
-        if not isinstance(documents, list) or (documents and not isinstance(documents[0], Document)):
-            raise TypeError("EmbeddingBasedDocumentSplitter expects a List of Documents as input.")
-
         split_docs: list[Document] = []
-        for doc in documents:
-            if doc.content is None:
-                raise ValueError(
-                    f"EmbeddingBasedDocumentSplitter only works with text documents but content for "
-                    f"document ID {doc.id} is None."
-                )
-            if doc.content == "":
-                logger.warning("Document ID {doc_id} has an empty content. Skipping this document.", doc_id=doc.id)
-                continue
-
+        for doc in self._validated_documents(documents):
             doc_splits = self._split_document(doc=doc)
             split_docs.extend(doc_splits)
 
@@ -232,20 +236,8 @@ class EmbeddingBasedDocumentSplitter:
         """
         await self.warm_up_async()
 
-        if not isinstance(documents, list) or (documents and not isinstance(documents[0], Document)):
-            raise TypeError("EmbeddingBasedDocumentSplitter expects a List of Documents as input.")
-
         tasks: list[Awaitable[list[Document]]] = []
-        for doc in documents:
-            if doc.content is None:
-                raise ValueError(
-                    f"EmbeddingBasedDocumentSplitter only works with text documents but content for "
-                    f"document ID {doc.id} is None."
-                )
-            if doc.content == "":
-                logger.warning("Document ID {doc_id} has an empty content. Skipping this document.", doc_id=doc.id)
-                continue
-
+        for doc in self._validated_documents(documents):
             tasks.append(self._split_document_async(doc=doc))
 
         return {"documents": [*chain.from_iterable(await gather(*tasks))]}
