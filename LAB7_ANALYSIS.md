@@ -29,16 +29,16 @@
 
 | Evidence | Baseline |
 |---|---|
-| Baseline commit SHA and link | [To record after the baseline workflow commit is approved and pushed] |
-| Actions workflow file link | [`.github/workflows/lab7-retrieval.yml`](.github/workflows/lab7-retrieval.yml) |
-| Ubuntu/runtime and relevant dependency versions | GitHub-hosted `ubuntu-24.04`, Python 3.11, Hatch 1.16.5 |
-| How the fork's code is installed/built and verified as the executed code | `hatch run` installs the project from the checked-out repository in its Hatch environment; the job logs `git rev-parse HEAD`; the script prints and asserts `haystack.__file__` is inside the checkout |
-| Functional case executed (command/script/test or local endpoint) | [`scripts/lab7_retrieval.py`](scripts/lab7_retrieval.py) indexes three local documents and calls the application-facing `retrieve_solar_documents()` path backed by `InMemoryBM25Retriever.run` |
-| Expected vs observed behavior | Local baseline check: expected archived guide first; observed IDs `["archived-solar-guide", "active-solar-guide"]` |
-| Check result and meaningful measurement(s), if any | Local Hatch-run baseline passed; output IDs were `["archived-solar-guide", "active-solar-guide"]`, and the imported module path was within the checkout; GitHub baseline pending |
-| Exact GitHub Actions run URL | [Pending] |
+| Baseline commit SHA and link | [`1998143da38a84b227ea844943b47ebc5bd7d132`](https://github.com/btatongk/haystack/commit/1998143da38a84b227ea844943b47ebc5bd7d132) |
+| Actions workflow file link | [`lab7-retrieval.yml`](https://github.com/btatongk/haystack/blob/1998143da38a84b227ea844943b47ebc5bd7d132/.github/workflows/lab7-retrieval.yml) |
+| Ubuntu/runtime and relevant dependency versions | GitHub-hosted `ubuntu-24.04`, Python 3.11.18, Hatch 1.16.5 |
+| How the fork's code is installed/built and verified as the executed code | `hatch run` installed the project in development mode from the checked-out repository; the job logged `git rev-parse HEAD` as `1998143da38a84b227ea844943b47ebc5bd7d132`; the script printed `/home/runner/work/haystack/haystack/haystack/__init__.py` and asserted `haystack.__file__` is inside the checkout |
+| Functional case executed (command/script/test or local endpoint) | [`scripts/lab7_retrieval.py`](https://github.com/btatongk/haystack/blob/1998143da38a84b227ea844943b47ebc5bd7d132/scripts/lab7_retrieval.py) indexed three local documents and called the application-facing `retrieve_solar_documents()` path backed by `InMemoryBM25Retriever.run` |
+| Expected vs observed behavior | Expected archived guide first; observed IDs `["archived-solar-guide", "active-solar-guide"]` |
+| Check result and meaningful measurement(s), if any | Passed; runner installed the fork checkout and produced the expected BM25 result. The job completed successfully in about 18 seconds after starting (13:41:49Z–13:42:07Z). |
+| Exact GitHub Actions run URL | https://github.com/btatongk/haystack/actions/runs/45831640850 |
 
-**What does this establish, and what does it not establish?** The local Hatch-run check establishes the baseline output for this fixed input and confirms the imported module came from the local checkout. It is not GitHub-hosted evidence and does not yet establish clean-runner installation or the behavior of a pushed commit.
+**What does this establish, and what does it not establish?** The GitHub-hosted run establishes that this exact fork commit installed in a fresh Ubuntu runner and produced the expected baseline output from the checkout's Haystack module. It demonstrates this fixed example only; it does not establish production-scale retrieval quality or validate the planned active-only behavior change.
 
 ## 3. Controlled change and verification
 
