@@ -62,20 +62,20 @@
 
 ## 4. Engineering judgment and submission
 
-**Answer Q1:** [Complete from both GitHub Actions runs.]
+**Answer Q1:** Yes for this scenario. Both GitHub Actions runs installed the fork in a clean `ubuntu-24.04` runner, confirmed the expected checkout SHA, imported `haystack` from the checkout, and completed the BM25 case. The baseline returned the archived guide first; the changed run completed with the active-only result.
 
-**Answer Q2:** [Complete from both GitHub Actions runs.]
+**Answer Q2:** Yes for this fixed corpus and query. The changed retrieval path excluded `archived-solar-guide` and returned `active-solar-guide`; the before/after runs used the same three documents and `"solar energy"` query.
 
-**Release decision:** [Accept changed version / request changes / insufficient evidence — and why]
+**Release decision:** Accept the changed behavior for this controlled Lab 7 scenario. The active-only result matched the stated contract in local checks and on GitHub Actions, while preserving the relevant active guide. This is not sufficient evidence to claim production retrieval quality.
 
-**One important limitation or missing check:** The fixed in-memory corpus is small and synthetic; it demonstrates execution and the filtering contract but not retrieval quality on production-scale, diverse, or changing documents.
+**One important limitation or missing check:** This is a small synthetic corpus exercised by a Lab 7 script, not a production pipeline. It demonstrates the filtering contract and clean-runner execution, but does not validate retrieval quality on real or production-scale data.
 
 | GitHub evidence | Link |
 |---|---|
-| Lab #7 pull request (within your fork) | [Pending; requires approval before creating or merging] |
+| Lab #7 pull request (within your fork) | [Pending; requires approval before creating] |
 | **Merged commit** on `semester-investigation` | [Pending] |
 | Final `LAB7_ANALYSIS.md` on merged branch | [Pending] |
-| Student 1 meaningful commit(s) | [Pending] |
+| Student 1 meaningful commit(s) | [Baseline workflow](https://github.com/btatongk/haystack/commit/1998143da38a84b227ea844943b47ebc5bd7d132); [active-only retrieval change](https://github.com/btatongk/haystack/commit/b2b83318c37baabf4e282dea2d37cfca53930e2d) |
 
 **LLM assistance (if used):** Assisted with scoping the BM25 case, drafting the report, and implementation planning. The API behavior and local before/after result were checked against the fork's source and runtime.
 
