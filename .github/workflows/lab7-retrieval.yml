@@ -1,0 +1,38 @@
+name: Lab 7 - BM25 Retrieval
+
+on:
+  push:
+    branches:
+      - semester-investigation
+    paths:
+      - ".github/workflows/lab7-retrieval.yml"
+      - "scripts/lab7_retrieval.py"
+      - "pyproject.toml"
+
+permissions:
+  contents: read
+
+jobs:
+  baseline-retrieval:
+    name: Install fork and verify baseline retrieval
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out fork commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.11"
+
+      - name: Install Hatch
+        run: python -m pip install hatch==1.16.5
+
+      - name: Confirm checked-out commit
+        run: git rev-parse HEAD
+
+      - name: Install fork checkout and run baseline case
+        run: hatch run python scripts/lab7_retrieval.py
