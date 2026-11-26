@@ -42,7 +42,7 @@
 
 ## 3. Controlled change and verification
 
-**Source/function changed:** [Planned Lab 7 application-facing retrieval function; link after implementation]
+**Source/function changed:** [`retrieve_solar_documents()` in `scripts/lab7_retrieval.py`](scripts/lab7_retrieval.py)
 **Reason for change:** Exclude archived material from current retrieval results so users do not receive outdated guidance as the top answer.
 **Code-change commit(s):** [Not created; do not commit without user approval]
 
@@ -50,15 +50,15 @@
 |---|---|---|
 | Same input/case | Three documents; query `"solar energy"` | Same three documents and query |
 | Expected behavior under each version's stated contract | Archived solar guide may rank first | Only active documents are eligible; active solar guide should rank first |
-| Observed behavior on GitHub runner | [Pending] | [Pending] |
-| Automated case check/result | [To implement] | [To implement] |
-| Unchanged regression/invariant check | Fork checkout verified; solar relevance is measured | Active solar guide is still returned first; fork checkout verified |
+| Observed behavior (local / GitHub runner) | Local and Actions runs returned `["archived-solar-guide", "active-solar-guide"]` | Local Hatch run returned `["active-solar-guide"]`; GitHub run pending |
+| Automated case check/result | Asserted exact IDs `["archived-solar-guide", "active-solar-guide"]` | Script asserted exact IDs `["active-solar-guide"]` and passed locally; 3 focused BM25 filter tests passed, 21 deselected |
+| Unchanged regression/invariant check | Fork checkout verified; solar relevance is measured | Active solar guide is still returned first; local checkout import verified, GitHub verification pending |
 | Exact Actions run URL | [Pending] | [Pending] |
 | Commit SHA | [Pending] | [Pending] |
 
-**How do your checks distinguish the two versions?** [Complete after implementing and running the checks.]
+**How do your checks distinguish the two versions?** The same query and three-document corpus are used in each version. The baseline asserts that the archived guide ranks first; the changed retrieval function passes an `active` status filter at runtime and asserts that only the active solar guide is returned. Both versions also check that the imported Haystack module comes from the checked-out repository.
 
-**Did anything fail unexpectedly? What did you learn or fix?** [Complete after the GitHub runs.]
+**Did anything fail unexpectedly? What did you learn or fix?** Hatch was missing from PATH locally, so Hatch 1.16.5 was installed before running checks. The scenario and focused filter tests passed; the changed behavior still needs its GitHub Actions run.
 
 ## 4. Engineering judgment and submission
 

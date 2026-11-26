@@ -1,4 +1,4 @@
-"""Run the Lab 7 baseline retrieval case against the checked-out Haystack source."""
+"""Run the Lab 7 active-only retrieval case against the checked-out Haystack source."""
 
 from __future__ import annotations
 
@@ -11,12 +11,15 @@ from haystack.document_stores.in_memory import InMemoryDocumentStore
 
 
 def retrieve_solar_documents(retriever: InMemoryBM25Retriever) -> list[Document]:
-    """Retrieve documents for the Lab 7 solar-energy query."""
-    return retriever.run(query="solar energy")["documents"]
+    """Retrieve active documents for the Lab 7 solar-energy query."""
+    return retriever.run(
+        query="solar energy",
+        filters={"field": "meta.status", "operator": "==", "value": "active"},
+    )["documents"]
 
 
 def main() -> None:
-    """Run and assert the baseline local BM25 retrieval case."""
+    """Run and assert the active-only local BM25 retrieval case."""
     checkout = Path.cwd().resolve()
     imported_from = Path(haystack.__file__).resolve()
 
@@ -56,10 +59,10 @@ def main() -> None:
         print("Query: solar energy")
         print(f"Retrieved document IDs: {retrieved_ids}")
 
-        expected_ids = ["archived-solar-guide", "active-solar-guide"]
+        expected_ids = ["active-solar-guide"]
         if retrieved_ids != expected_ids:
-            raise AssertionError(f"Expected baseline IDs {expected_ids}, received {retrieved_ids}")
-        print("PASS baseline BM25 retrieval")
+            raise AssertionError(f"Expected active-only IDs {expected_ids}, received {retrieved_ids}")
+        print("PASS active-only BM25 retrieval")
     finally:
         store.shutdown()
 
