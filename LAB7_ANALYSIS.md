@@ -38,27 +38,27 @@
 | Check result and meaningful measurement(s), if any | Passed; runner installed the fork checkout and produced the expected BM25 result. The job completed successfully in about 18 seconds after starting (13:41:49Z–13:42:07Z). |
 | Exact GitHub Actions run URL | https://github.com/btatongk/haystack/actions/runs/45831640850 |
 
-**What does this establish, and what does it not establish?** The GitHub-hosted run establishes that this exact fork commit installed in a fresh Ubuntu runner and produced the expected baseline output from the checkout's Haystack module. It demonstrates this fixed example only; it does not establish production-scale retrieval quality or validate the planned active-only behavior change.
+**What does this establish, and what does it not establish?** The baseline GitHub-hosted run establishes that the fork installed in a fresh Ubuntu runner and produced the expected unfiltered output from the checkout's Haystack module. The controlled-change run and its limitations are recorded in Section 3; these fixed synthetic documents do not establish production-scale retrieval quality.
 
 ## 3. Controlled change and verification
 
 **Source/function changed:** [`retrieve_solar_documents()` in `scripts/lab7_retrieval.py`](scripts/lab7_retrieval.py)
 **Reason for change:** Exclude archived material from current retrieval results so users do not receive outdated guidance as the top answer.
-**Code-change commit(s):** [Not created; do not commit without user approval]
+**Code-change commit(s):** [`b2b83318c37baabf4e282dea2d37cfca53930e2d`](https://github.com/btatongk/haystack/commit/b2b83318c37baabf4e282dea2d37cfca53930e2d)
 
 | Item | Before change | After change |
 |---|---|---|
 | Same input/case | Three documents; query `"solar energy"` | Same three documents and query |
 | Expected behavior under each version's stated contract | Archived solar guide may rank first | Only active documents are eligible; active solar guide should rank first |
-| Observed behavior (local / GitHub runner) | Local and Actions runs returned `["archived-solar-guide", "active-solar-guide"]` | Local Hatch run returned `["active-solar-guide"]`; GitHub run pending |
-| Automated case check/result | Asserted exact IDs `["archived-solar-guide", "active-solar-guide"]` | Script asserted exact IDs `["active-solar-guide"]` and passed locally; 3 focused BM25 filter tests passed, 21 deselected |
-| Unchanged regression/invariant check | Fork checkout verified; solar relevance is measured | Active solar guide is still returned first; local checkout import verified, GitHub verification pending |
-| Exact Actions run URL | [Pending] | [Pending] |
-| Commit SHA | [Pending] | [Pending] |
+| Observed behavior (local / GitHub runner) | Local and Actions runs returned `["archived-solar-guide", "active-solar-guide"]` | Local Hatch run and Actions run returned `["active-solar-guide"]` |
+| Automated case check/result | Asserted exact IDs `["archived-solar-guide", "active-solar-guide"]` | Script asserted exact IDs `["active-solar-guide"]`; local script passed, as did 3 focused BM25 filter tests (21 deselected) |
+| Unchanged regression/invariant check | Fork checkout verified; solar relevance is measured | Active solar guide remained first; Actions confirmed the Haystack import came from the checkout |
+| Exact Actions run URL | https://github.com/btatongk/haystack/actions/runs/45831640850 | https://github.com/btatongk/haystack/actions/runs/45834954616 |
+| Commit SHA | `1998143da38a84b227ea844943b47ebc5bd7d132` | `b2b83318c37baabf4e282dea2d37cfca53930e2d` |
 
 **How do your checks distinguish the two versions?** The same query and three-document corpus are used in each version. The baseline asserts that the archived guide ranks first; the changed retrieval function passes an `active` status filter at runtime and asserts that only the active solar guide is returned. Both versions also check that the imported Haystack module comes from the checked-out repository.
 
-**Did anything fail unexpectedly? What did you learn or fix?** Hatch was missing from PATH locally, so Hatch 1.16.5 was installed before running checks. The scenario and focused filter tests passed; the changed behavior still needs its GitHub Actions run.
+**Did anything fail unexpectedly? What did you learn or fix?** Hatch was missing from PATH locally, so Hatch 1.16.5 was installed before running checks. The local scenario and focused filter tests passed, and the changed behavior passed on GitHub Actions.
 
 ## 4. Engineering judgment and submission
 
